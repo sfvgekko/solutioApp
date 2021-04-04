@@ -6,7 +6,7 @@ Java 11 - Spring Boot 2.4.4 - Maven 3.6.3
 
 ## Start Application
 1. Install application: ```mvn clean install```
-2. Run jar file: ```java -jar ../target/solutio-0.0.1.jar```
+2. Run jar file: ```java -jar ./target/solutio-0.0.1.jar```
 
 ## Functionality
 The application consumes tweets to the user timeline and store them according to certain criteria.
