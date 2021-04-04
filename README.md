@@ -24,9 +24,9 @@ The application create by deafault 10 users for testing purposes: **user1** to *
 The password is **solutio** for all the users.
 
 ## Swagger and H2
-Swagger UI is included in path /swagger-UI.html
+Swagger UI is included in path ```/swagger-UI.html```
 
-H2 console is included in path /h2-console/
+H2 console is included in path ```/h2-console/```
 
 ## Postman
 Postman requests collection is allowed to test the application in the next link:
