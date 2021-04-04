@@ -1,8 +1,8 @@
-package com.twitter.solutio.utils;
+package com.twitter.solutio.stubs;
 
 import twitter4j.HashtagEntity;
 
-public class HashtagEntityTest implements HashtagEntity {
+public class HashtagStub implements HashtagEntity {
 
     private String text;
 

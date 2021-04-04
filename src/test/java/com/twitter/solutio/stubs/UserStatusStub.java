@@ -1,11 +1,11 @@
-package com.twitter.solutio.utils;
+package com.twitter.solutio.stubs;
 
 import twitter4j.*;
 
 import java.util.Date;
 
 
-public class UserTest implements User {
+public class UserStatusStub implements User {
 
     private String name;
     private int followersCount;

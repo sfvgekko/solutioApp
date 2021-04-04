@@ -1,17 +1,18 @@
-package com.twitter.solutio.utils;
+package com.twitter.solutio.stubs;
 
 import twitter4j.*;
 
 import java.util.Date;
 
-public class StatusTest implements Status {
+
+public class StatusStub implements Status {
 
     private String text;
     private String lang;
-    private HashtagEntityTest[] hashtagEntities;
-    private UserTest user;
+    private HashtagStub[] hashtagEntities;
+    private UserStatusStub user;
 
-    public void setUser(UserTest user) {
+    public void setUser(UserStatusStub user) {
         this.user = user;
     }
 
@@ -23,7 +24,7 @@ public class StatusTest implements Status {
         this.lang = lang;
     }
 
-    public void setHashtagEntities(HashtagEntityTest[] hashtagEntities) {
+    public void setHashtagEntities(HashtagStub[] hashtagEntities) {
         this.hashtagEntities = hashtagEntities;
     }
 

@@ -1,10 +1,10 @@
-package com.twitter.solutio.services;
+package com.twitter.solutio.application;
 
-import com.twitter.solutio.models.Tweet;
-import com.twitter.solutio.repositories.TweetRepository;
-import com.twitter.solutio.utils.TweetStoreRules;
+import com.twitter.solutio.domain.Tweet;
+import com.twitter.solutio.domain.TweetRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,20 +16,13 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class TweetService {
+public class TweetsApiService {
+
+    @Value("${rules.itemsInHashtagRank}")
+    private int itemsInHashtagRank;
 
     @Autowired
     TweetRepository tweetRepository;
-
-    @Autowired
-    TweetStoreRules tweetStoreRules;
-
-
-    public Tweet saveTweet(Tweet tweet){
-        log.info("Adding tweet {}", tweet);
-        tweet.setText(tweetStoreRules.trimTextToMaxLength(tweet.getText()));
-        return tweetRepository.save(tweet);
-    }
 
 
     public List<Tweet> getAllTweets() {
@@ -75,7 +68,7 @@ public class TweetService {
                                                 .stream()
                                                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
                                                 .map(Map.Entry::getKey)
-                                                .limit(tweetStoreRules.getItemsInHashtagRank())
+                                                .limit(itemsInHashtagRank)
                                                 .collect(Collectors.toList());
     }
 

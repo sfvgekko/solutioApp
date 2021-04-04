@@ -1,15 +1,15 @@
-package com.twitter.solutio.services;
+package com.twitter.solutio.infraestructure;
 
-import com.twitter.solutio.listeners.StreamTweetsListener;
-import com.twitter.solutio.models.Tweet;
-import com.twitter.solutio.repositories.TweetRepository;
-import com.twitter.solutio.utils.TweetStoreRules;
+import com.twitter.solutio.application.TweetsApiService;
+import com.twitter.solutio.domain.Tweet;
+import com.twitter.solutio.domain.TweetRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -18,59 +18,30 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.any;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.collection.ArrayMatching.arrayContaining;
-import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 
-@WebMvcTest(TweetService.class)
+@WebMvcTest(TweetsApiService.class)
 @WithMockUser(username = "userTest")
 @ExtendWith(MockitoExtension.class)
-class TweetServiceTest {
+class TweetsApiServiceTest {
 
-    @InjectMocks
-    TweetService tweetService;
+    @Value("${rules.itemsInHashtagRank}")
+    private int itemsInHashtagRank;
+
+    @Autowired
+    TweetsApiService tweetsApiService;
 
     @MockBean
     TweetRepository tweetRepository;
 
     @MockBean
-    TweetStoreRules tweetStoreRules;
+    TweetsStreamListener tweetsStreamListener;
 
-    @MockBean
-    StreamTweetsListener streamTweetsListener;
-
-
-    @Test
-    void saveTweetTest() {
-        //Given
-        Tweet tweet = new Tweet();
-        tweet.setId(1L);
-        tweet.setUser("userTest");
-        tweet.setText("Text to test");
-        tweet.setLang("es");
-        tweet.setValidated(false);
-        tweet.setHashtagsList(new String[] {"Hashtag1", "Hashtag2"});
-
-        //When
-        when(tweetRepository.save(any(Tweet.class))).thenReturn(tweet);
-        Tweet response = tweetService.saveTweet(mock(Tweet.class));
-
-        //Then
-        assertThat(response, instanceOf(Tweet.class));
-        assertThat(response.getId(), is(1L));
-        assertThat(response.getUser(), is("userTest"));
-        assertThat(response.getText(), is("Text to test"));
-        assertThat(response.getLang(), is("es"));
-        assertThat(response.getValidated(), is(false));
-        assertThat(response.getHashtagsList(), arrayContaining("Hashtag1", "Hashtag2"));
-        assertThat(response.getValidatorUser(), nullValue());
-    }
 
     @Test
     void getAllTweetsTest() {
@@ -87,11 +58,12 @@ class TweetServiceTest {
 
         //When
         when(tweetRepository.findAll()).thenReturn(tweetList);
-        List<Tweet> response = tweetService.getAllTweets();
+        List<Tweet> response = tweetsApiService.getAllTweets();
 
         //Then
         assertThat(response.size(), is(2));
     }
+
 
     @Test
     void validateTweetOkTest() {
@@ -104,13 +76,14 @@ class TweetServiceTest {
         ArgumentCaptor<Tweet> tweetCaptured = ArgumentCaptor.forClass(Tweet.class);
         when(tweetRepository.save(tweetCaptured.capture())).thenReturn(mock(Tweet.class));
         when(tweetRepository.findById(anyLong())).thenReturn(java.util.Optional.of(tweet));
-        tweetService.validateTweet(1L);
+        tweetsApiService.validateTweet(1L);
 
         //Then
         verify(tweetRepository, times(1)).save(any(Tweet.class));
         assertThat(tweetCaptured.getValue().getValidated(), is(true));
         assertThat(tweetCaptured.getValue().getValidatorUser(), is("userTest"));
     }
+
 
     @Test
     void validateTweetAlreadyValidatedTest() {
@@ -124,9 +97,10 @@ class TweetServiceTest {
         when(tweetRepository.findById(anyLong())).thenReturn(java.util.Optional.of(tweet));
 
         //Then
-        Assertions.assertThrows(ResponseStatusException.class, () -> tweetService.validateTweet(1L));
+        Assertions.assertThrows(ResponseStatusException.class, () -> tweetsApiService.validateTweet(1L));
         verify(tweetRepository, never()).save(any(Tweet.class));
     }
+
 
     @Test
     void validateTweetWithWrongIdTest() {
@@ -136,25 +110,26 @@ class TweetServiceTest {
         when(tweetRepository.findById(anyLong())).thenReturn(java.util.Optional.empty());
 
         //Then
-        Assertions.assertThrows(ResponseStatusException.class, () -> tweetService.validateTweet(1L));
+        Assertions.assertThrows(ResponseStatusException.class, () -> tweetsApiService.validateTweet(1L));
         verify(tweetRepository, never()).save(any(Tweet.class));
     }
+
 
     @Test
     void getValidatedTweetsByUserTest() {
         //Given
 
         //When
-        tweetService.getValidatedTweetsByUser("");
+        tweetsApiService.getValidatedTweetsByUser("");
         //Then
         verify(tweetRepository, times(1)).findByValidatorUserAndValidatedTrue(anyString());
 
     }
 
+
     @Test
     void getHashtagRankTest() {
         //Given
-
         //Times of Hashtags in dummy data
         //Hashtag1 = 5 - Hashtag2 = 4 - Hashtag3 to Hashtag9 = 3 ; Hashtag10 = 2 ; Hashtag11 and Hashtag12 = 1
         Tweet tweet1 = new Tweet();
@@ -177,8 +152,7 @@ class TweetServiceTest {
 
         //When
         when(tweetRepository.findAll()).thenReturn(tweetList);
-        when(tweetStoreRules.getItemsInHashtagRank()).thenReturn(10);
-        List<String> response =  tweetService.getHashtagRank();
+        List<String> response =  tweetsApiService.getHashtagRank();
 
         //Then
         assertThat(response.size(), is(10));
@@ -186,4 +160,6 @@ class TweetServiceTest {
         assertThat(response.get(1), is("Hashtag2"));
         assertThat(response.get(9), is("Hashtag10"));
     }
+
+
 }

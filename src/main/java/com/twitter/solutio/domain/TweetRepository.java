@@ -1,6 +1,5 @@
-package com.twitter.solutio.repositories;
+package com.twitter.solutio.domain;
 
-import com.twitter.solutio.models.Tweet;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

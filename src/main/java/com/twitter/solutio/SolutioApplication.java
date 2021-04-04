@@ -1,6 +1,6 @@
 package com.twitter.solutio;
 
-import com.twitter.solutio.listeners.StreamTweetsListener;
+import com.twitter.solutio.infraestructure.TweetsStreamListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,7 +14,7 @@ import javax.annotation.PostConstruct;
 public class SolutioApplication {
 
 	@Autowired
-	StreamTweetsListener streamTweetsListener;
+    TweetsStreamListener tweetsStreamListener;
 
 	public static void main(String[] args) {
 		SpringApplication.run(SolutioApplication.class, args);
@@ -23,7 +23,7 @@ public class SolutioApplication {
 	@PostConstruct
 	public void execute(){
 		TwitterStream twitterStream = new TwitterStreamFactory().getInstance();
-		twitterStream.addListener(streamTweetsListener);
+		twitterStream.addListener(tweetsStreamListener);
 		// sample() method internally creates a thread which manipulates TwitterStream and calls these adequate listener methods continuously.
 		twitterStream.sample();
 	}

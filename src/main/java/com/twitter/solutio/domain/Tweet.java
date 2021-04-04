@@ -1,6 +1,7 @@
-package com.twitter.solutio.models;
+package com.twitter.solutio.domain;
 
 import javax.persistence.*;
+import java.util.Arrays;
 
 @Entity
 public class Tweet {
@@ -12,10 +13,12 @@ public class Tweet {
 
     @Column(length=280)
     private String text;
+
     private String lang;
     private Boolean validated;
     private String validatorUser;
     private String [] hashtagsList;
+    private int followers;
 
     public Long getId() {
         return id;
@@ -73,6 +76,15 @@ public class Tweet {
         this.hashtagsList = hashtagsList;
     }
 
+    public int getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(int followers) {
+        this.followers = followers;
+    }
+
+
     @Override
     public String toString() {
         return "Tweet{" +
@@ -82,7 +94,8 @@ public class Tweet {
                 ", lang='" + lang + '\'' +
                 ", validated=" + validated +
                 ", validatorUser='" + validatorUser + '\'' +
-                ", hashtagsList=" + hashtagsList +
+                ", hashtagsList=" + Arrays.toString(hashtagsList) +
+                ", followers=" + followers +
                 '}';
     }
 }

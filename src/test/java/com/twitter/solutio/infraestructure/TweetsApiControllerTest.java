@@ -1,8 +1,7 @@
-package com.twitter.solutio.controllers;
+package com.twitter.solutio.infraestructure;
 
-import com.twitter.solutio.listeners.StreamTweetsListener;
-import com.twitter.solutio.models.Tweet;
-import com.twitter.solutio.services.TweetService;
+import com.twitter.solutio.domain.Tweet;
+import com.twitter.solutio.application.TweetsApiService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -22,18 +21,18 @@ import static org.mockito.Mockito.*;
 import static org.hamcrest.Matchers.*;
 
 
-@WebMvcTest(TweetController.class)
+@WebMvcTest(TweetsApiController.class)
 @ExtendWith(MockitoExtension.class)
-class TweetControllerTest {
+class TweetsApiControllerTest {
 
     @Autowired
     MockMvc mockMvc;
 
     @MockBean
-    TweetService tweetService;
+    TweetsApiService tweetsApiService;
 
     @MockBean
-    StreamTweetsListener streamTweetsListener;
+    TweetsStreamListener tweetsStreamListener;
 
     @Test
     @WithMockUser(username = "user1")
@@ -50,7 +49,7 @@ class TweetControllerTest {
         tweetList.add(tweet2);
 
         //When
-        when(tweetService.getAllTweets()).thenReturn(tweetList);
+        when(tweetsApiService.getAllTweets()).thenReturn(tweetList);
 
         //Then
         mockMvc.perform(MockMvcRequestBuilders.get("/tweets/all"))
@@ -73,7 +72,7 @@ class TweetControllerTest {
         tweetList.add(tweet2);
 
         //When
-        when(tweetService.getAllTweets()).thenReturn(tweetList);
+        when(tweetsApiService.getAllTweets()).thenReturn(tweetList);
 
         //Then
         mockMvc.perform(MockMvcRequestBuilders.get("/tweets/all"))
@@ -91,7 +90,7 @@ class TweetControllerTest {
         tweet.setValidatorUser("user1");
 
         //When
-        when(tweetService.validateTweet(anyLong())).thenReturn(tweet);
+        when(tweetsApiService.validateTweet(anyLong())).thenReturn(tweet);
 
         //Then
         mockMvc.perform(MockMvcRequestBuilders.put("/tweets/validate/1"))
@@ -126,7 +125,7 @@ class TweetControllerTest {
         tweetList.add(tweet3);
 
         //When
-        when(tweetService.getValidatedTweetsByUser(anyString())).thenReturn(tweetList);
+        when(tweetsApiService.getValidatedTweetsByUser(anyString())).thenReturn(tweetList);
 
         //Then
         mockMvc.perform(MockMvcRequestBuilders.get("/tweets/validated/user1"))
@@ -144,7 +143,7 @@ class TweetControllerTest {
         List<String> hashtagsRankList = Arrays.asList("Hashtag1", "Hashtag2", "Hashtag3", "Hashtag4", "Hashtag5",
                                                       "Hashtag6", "Hashtag7", "Hashtag8", "Hashtag9", "Hashtag10");
         //When
-        when(tweetService.getHashtagRank()).thenReturn(hashtagsRankList);
+        when(tweetsApiService.getHashtagRank()).thenReturn(hashtagsRankList);
 
         //Then
         mockMvc.perform(MockMvcRequestBuilders.get("/tweets/hashtagRank"))
