@@ -2,7 +2,7 @@
 Solutio App is a microservice for Twitter API testing purposes. 
 
 ## Tech Stack
-Java 11 - Spring Boot 2.4.4 - Maven 3.6.3
+Java 11 - Spring Boot 2.4.4 - Maven 3.6.3 - Database: H2 InMemory
 
 ## Start Application
 1. Include consumer key/secret in file ```twitter4j.properties```
